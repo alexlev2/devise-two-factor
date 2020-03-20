@@ -61,6 +61,13 @@ module Devise
 
     protected
 
+      def verify_with_drift(otp, drift, time = Time.now)
+        time = time.to_i
+        times = (time-drift..time+drift).step(interval).to_a
+        times << time + drift if times.last < time + drift
+        times.any? { |ti| verify(otp, ti) }
+      end
+
       # An OTP cannot be used more than once in a given timestep
       # Storing timestep of last valid OTP is sufficient to satisfy this requirement
       def consume_otp!
